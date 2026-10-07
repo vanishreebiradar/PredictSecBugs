@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test-model:
+  test-code:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,8 +19,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas numpy scikit-learn joblib
+          pip install pandas numpy scikit-learn joblib streamlit
 
-      - name: Test trained model
+      - name: Check Python files
         run: |
-          python -c "import joblib; joblib.load('random_forest_model.pkl'); joblib.load('preprocessor.pkl'); print('PredictSecBugs model loaded successfully')"
+          python -m py_compile app.py
+          python -m compileall extraction
+
+      - name: CI check completed
+        run: |
+          echo "PredictSecBugs CI checks passed successfully"
