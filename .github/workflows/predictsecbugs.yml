@@ -1,0 +1,26 @@
+name: PredictSecBugs CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy scikit-learn joblib
+
+      - name: Test trained model
+        run: |
+          python -c "import joblib; joblib.load('random_forest_model.pkl'); joblib.load('preprocessor.pkl'); print('PredictSecBugs model loaded successfully')"
