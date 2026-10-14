@@ -1,3 +1,4 @@
+
 name: PredictSecBugs CI
 
 on:
@@ -19,13 +20,28 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas numpy scikit-learn joblib streamlit
+          python -m pip install pandas numpy scikit-learn joblib streamlit
 
       - name: Check Python files
         run: |
           python -m py_compile app.py
+          python -m py_compile test_model.py
           python -m compileall extraction
 
-      - name: CI check completed
+      - name: Check model files
+        id: model_files
+        shell: bash
         run: |
-          echo "PredictSecBugs CI checks passed successfully"
+          if [ -f random_forest_model.pkl ] && [ -f preprocessor.pkl ] && [ -f aprrentissage/read.csv ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "Model files or dataset are unavailable; prediction test will be skipped."
+          fi
+
+      - name: Run model test
+        if: steps.model_files.outputs.available == 'true'
+        run: python test_model.py
+
+      - name: CI check completed
+        run: echo "PredictSecBugs CI checks completed"
